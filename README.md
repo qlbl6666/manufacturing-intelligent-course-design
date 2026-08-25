@@ -1,0 +1,1 @@
+# manufacturing-intelligent-course-design
