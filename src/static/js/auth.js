@@ -1,9 +1,5 @@
 // 认证相关功能
-const API_BASE = '/api';
-
-// 配置 axios
-axios.defaults.baseURL = API_BASE;
-axios.defaults.withCredentials = true;
+// 注意：请求路径直接写 /api/...，不设置 baseURL 避免路径重复
 
 // 响应拦截器：处理 401 未授权
 axios.interceptors.response.use(
@@ -65,7 +61,7 @@ function hideLoading() {
 // 检查登录状态
 async function checkAuth() {
     try {
-        const response = await axios.get('/auth/me');
+        const response = await axios.get('/api/auth/me');
         const user = response.data.user;
         // 更新导航栏用户名
         const usernameEl = document.getElementById('nav-username');
@@ -83,7 +79,7 @@ async function checkAuth() {
 // 登出
 async function logout() {
     try {
-        await axios.post('/auth/logout');
+        await axios.post('/api/auth/logout');
         showToast('已退出登录');
         setTimeout(() => window.location.href = '/login', 500);
     } catch (error) {
