@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}统计分析 - 工业缺陷智能检测系统{% endblock %}
+
+{% block content %}
+<!-- 概览卡片 -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-icon text-primary"><i class="bi bi-file-earmark-image"></i></div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">总检测次数</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-icon text-danger"><i class="bi bi-bug-fill"></i></div>
+            <div class="stat-value" id="stat-defect">0</div>
+            <div class="stat-label">缺陷样本数</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-icon text-warning"><i class="bi bi-percent"></i></div>
+            <div class="stat-value" id="stat-rate">0%</div>
+            <div class="stat-label">缺陷率</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-icon text-success"><i class="bi bi-target"></i></div>
+            <div class="stat-value" id="stat-conf">0%</div>
+            <div class="stat-label">平均置信度</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 检测趋势 -->
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-graph-up me-2"></i>近7天检测趋势</div>
+            <div class="card-body"><div id="trend-chart" style="height:300px;"></div></div>
+        </div>
+    </div>
+    <!-- 缺陷分布 -->
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart me-2"></i>缺陷类型分布</div>
+            <div class="card-body"><div id="distribution-chart" style="height:300px;"></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- 模型性能 -->
+<div class="card mt-4">
+    <div class="card-header"><i class="bi bi-speedometer2 me-2"></i>模型性能统计</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="fw-semibold">检测模式使用情况</h6>
+                <div id="mode-chart" style="height:250px;"></div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-semibold">各类别平均置信度</h6>
+                <div id="class-conf-chart" style="height:250px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/stats.js"></script>
+{% endblock %}

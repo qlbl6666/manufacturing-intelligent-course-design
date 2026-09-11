@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}历史记录 - 工业缺陷智能检测系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-clock-history me-2"></i>检测历史记录</span>
+        <div>
+            <button class="btn btn-sm btn-outline-light" onclick="exportAll()">
+                <i class="bi bi-download me-1"></i>导出全部
+            </button>
+            <button class="btn btn-sm btn-outline-light" onclick="loadRecords()">
+                <i class="bi bi-arrow-clockwise me-1"></i>刷新
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- 筛选栏 -->
+        <div class="row mb-3 g-2">
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" id="filter-defect">
+                    <option value="">全部缺陷类型</option>
+                    <option value="crazing">裂纹</option>
+                    <option value="inclusion">夹杂</option>
+                    <option value="patches">斑块</option>
+                    <option value="pitted_surface">麻点</option>
+                    <option value="rolled-in_scale">氧化皮</option>
+                    <option value="scratches">划痕</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" id="filter-has-defect">
+                    <option value="">全部结果</option>
+                    <option value="true">有缺陷</option>
+                    <option value="false">无缺陷</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control form-control-sm" id="filter-start">
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control form-control-sm" id="filter-end">
+            </div>
+        </div>
+
+        <!-- 记录表格 -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>图片</th>
+                        <th>检测时间</th>
+                        <th>模式</th>
+                        <th>结果</th>
+                        <th>缺陷数</th>
+                        <th>缺陷类型</th>
+                        <th>置信度</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="records-tbody">
+                    <tr><td colspan="9" class="text-center text-muted py-4">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        <nav id="pagination-nav"></nav>
+    </div>
+</div>
+
+<!-- 详情模态框 -->
+<div class="modal fade" id="detail-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">检测详情</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detail-modal-body"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/records.js"></script>
+{% endblock %}

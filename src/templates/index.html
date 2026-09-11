@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}缺陷检测 - 工业缺陷智能检测系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 左侧：上传区域 -->
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-upload me-2"></i>图片上传
+            </div>
+            <div class="card-body">
+                <!-- 上传区域 -->
+                <div class="upload-area" id="upload-area">
+                    <input type="file" id="file-input" accept=".jpg,.jpeg,.png,.bmp" style="display:none;">
+                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                    <p class="upload-text mb-0">点击或拖拽图片到此处上传</p>
+                    <p class="upload-hint mb-0">支持 JPG / PNG / BMP，单张 ≤ 10MB</p>
+                </div>
+
+                <!-- 检测选项 -->
+                <div class="mt-3">
+                    <label class="form-label fw-semibold">检测模式</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="mode" id="mode-fast" value="fast">
+                            <label class="form-check-label" for="mode-fast">快速模式（仅分类）</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="mode" id="mode-precise" value="precise" checked>
+                            <label class="form-check-label" for="mode-precise">精确模式（分类+定位）</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label fw-semibold">置信度阈值: <span id="conf-value">0.25</span></label>
+                    <input type="range" class="form-range" id="conf-threshold" min="0.1" max="0.9" step="0.05" value="0.25">
+                </div>
+
+                <button class="btn btn-accent w-100 mt-3" id="detect-btn" disabled>
+                    <i class="bi bi-search me-2"></i>开始检测
+                </button>
+            </div>
+        </div>
+
+        <!-- 原图预览 -->
+        <div class="card mt-3" id="original-card" style="display:none;">
+            <div class="card-header">
+                <i class="bi bi-image me-2"></i>原始图片
+            </div>
+            <div class="card-body text-center">
+                <img id="original-image" class="image-preview" alt="原始图片">
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：检测结果 -->
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clipboard-data me-2"></i>检测结果</span>
+                <span id="result-badge" class="result-badge normal">等待检测</span>
+            </div>
+            <div class="card-body">
+                <!-- 结果图片 -->
+                <div class="text-center mb-3" id="result-image-container" style="display:none;">
+                    <img id="result-image" class="image-preview" alt="检测结果">
+                </div>
+
+                <!-- 无结果提示 -->
+                <div id="no-result" class="text-center text-muted py-5">
+                    <i class="bi bi-search display-4 d-block mb-3"></i>
+                    <p>上传图片后点击"开始检测"查看结果</p>
+                </div>
+
+                <!-- 结果详情 -->
+                <div id="result-details" style="display:none;">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="stat-card bg-light rounded">
+                                <div class="stat-icon text-primary"><i class="bi bi-bug"></i></div>
+                                <div class="stat-value" id="defect-count">0</div>
+                                <div class="stat-label">缺陷数量</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card bg-light rounded">
+                                <div class="stat-icon text-success"><i class="bi bi-percent"></i></div>
+                                <div class="stat-value" id="confidence-avg">0%</div>
+                                <div class="stat-label">平均置信度</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card bg-light rounded">
+                                <div class="stat-icon text-warning"><i class="bi bi-stopwatch"></i></div>
+                                <div class="stat-value" id="inference-time">0s</div>
+                                <div class="stat-label">推理耗时</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 预测类别 -->
+                    <div class="mb-3">
+                        <h6 class="fw-semibold">预测类别</h6>
+                        <div id="predicted-class"></div>
+                    </div>
+
+                    <!-- 各类别概率 -->
+                    <div class="mb-3">
+                        <h6 class="fw-semibold">类别概率分布</h6>
+                        <div id="probability-list"></div>
+                    </div>
+
+                    <!-- 缺陷列表 -->
+                    <div id="defect-list-container" style="display:none;">
+                        <h6 class="fw-semibold">缺陷详情</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>类型</th>
+                                        <th>置信度</th>
+                                        <th>位置 (x,y)</th>
+                                        <th>尺寸 (w×h)</th>
+                                        <th>面积</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="defect-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/detect.js"></script>
+{% endblock %}

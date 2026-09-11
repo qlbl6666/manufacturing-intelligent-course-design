@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}模型管理 - 工业缺陷智能检测系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-cpu me-2"></i>模型列表</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr><th>模型名称</th><th>类型</th><th>版本</th><th>状态</th><th>输入尺寸</th><th>类别数</th></tr>
+                        </thead>
+                        <tbody id="models-tbody">
+                            <tr><td colspan="6" class="text-center text-muted">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-sliders me-2"></i>阈值配置</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">置信度阈值: <span id="conf-display">0.25</span></label>
+                    <input type="range" class="form-range" id="conf-input" min="0.1" max="0.9" step="0.05" value="0.25">
+                    <div class="form-text">低于此置信度的检测结果将被过滤</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">IoU 阈值: <span id="iou-display">0.45</span></label>
+                    <input type="range" class="form-range" id="iou-input" min="0.1" max="0.9" step="0.05" value="0.45">
+                    <div class="form-text">非极大值抑制的 IoU 重叠阈值</div>
+                </div>
+                <button class="btn btn-primary w-100" onclick="saveThreshold()">
+                    <i class="bi bi-save me-1"></i>保存配置
+                </button>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-header"><i class="bi bi-info-circle me-2"></i>当前配置</div>
+            <div class="card-body" id="current-config">
+                <p class="text-muted small">加载中...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('conf-input').addEventListener('input', e => {
+    document.getElementById('conf-display').textContent = e.target.value;
+});
+document.getElementById('iou-input').addEventListener('input', e => {
+    document.getElementById('iou-display').textContent = e.target.value;
+});
+
+async function loadModels() {
+    try {
+        const res = await axios.get('/api/models');
+        const data = res.data;
+
+        // 渲染模型列表
+        document.getElementById('models-tbody').innerHTML = data.models.map(m => `
+            <tr>
+                <td><strong>${m.name}</strong></td>
+                <td><span class="badge bg-${m.type === 'classifier' ? 'primary' : 'warning'}">${m.type === 'classifier' ? '分类' : '检测'}</span></td>
+                <td>${m.version}</td>
+                <td><span class="badge bg-${m.status === 'loaded' ? 'success' : 'secondary'}">${m.status === 'loaded' ? '已加载' : '模拟模式'}</span></td>
+                <td>${m.input_size}</td>
+                <td>${m.classes}</td>
+            </tr>
+        `).join('');
+
+        // 渲染当前配置
+        const cfg = data.active_config;
+        document.getElementById('current-config').innerHTML = `
+            <p><strong>分类模型:</strong> ${cfg.active_classifier}</p>
+            <p><strong>检测模型:</strong> ${cfg.active_detector}</p>
+            <p><strong>置信度阈值:</strong> ${cfg.conf_threshold}</p>
+            <p><strong>IoU 阈值:</strong> ${cfg.iou_threshold}</p>
+        `;
+        document.getElementById('conf-input').value = cfg.conf_threshold;
+        document.getElementById('iou-input').value = cfg.iou_threshold;
+        document.getElementById('conf-display').textContent = cfg.conf_threshold;
+        document.getElementById('iou-display').textContent = cfg.iou_threshold;
+    } catch (error) {
+        document.getElementById('models-tbody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">加载失败（需要管理员权限）</td></tr>';
+    }
+}
+
+async function saveThreshold() {
+    const conf = parseFloat(document.getElementById('conf-input').value);
+    const iou = parseFloat(document.getElementById('iou-input').value);
+    try {
+        await axios.put('/api/models/threshold', { conf_threshold: conf, iou_threshold: iou });
+        showToast('配置已保存');
+        loadModels();
+    } catch (error) {
+        showToast('保存失败: ' + (error.response?.data?.error || error.message), 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadModels);
+</script>
+{% endblock %}
