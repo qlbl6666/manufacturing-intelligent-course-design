@@ -4,14 +4,14 @@
 
 ## 项目简介
 
-本项目是面向制造/工业场景的智能应用，运用 vibe coding 方法开发一个 B/S 架构的工业产品表面缺陷智能检测系统。用户通过浏览器上传工业产品表面图片，系统自动调用深度学习模型进行缺陷识别与定位，实现制造环节质量检测的智能化。
+本项目是面向制造/工业场景的智能应用，运用 vibe coding 方法开发一个 **B/S + C/S 双架构** 的工业产品表面缺陷智能检测系统。用户可通过浏览器（B/S 端）或桌面客户端（C/S 端）上传工业产品表面图片，系统自动调用深度学习模型进行缺陷识别与定位，实现制造环节质量检测的智能化。
 
 ## 课程设计信息
 
 - **课程名称**：制造智能技术
 - **项目题目**：基于深度学习的工业产品表面缺陷智能检测系统
 - **开发方法**：Vibe Coding（AI 辅助编程）
-- **系统架构**：B/S 架构（浏览器/服务器）
+- **系统架构**：B/S + C/S 双架构（浏览器/服务器 + 桌面客户端/服务器）
 
 ## 技术方向
 
@@ -22,15 +22,21 @@
 | 1 | 深度学习与卷积神经网络 | ResNet50 缺陷分类、YOLOv8 缺陷检测 |
 | 2 | 计算机视觉与图像处理 | 图像预处理、数据增强、结果可视化 |
 | 3 | 机器学习与模式识别 | 模型训练、评估、超参数优化 |
-| 4 | 智能制造系统与架构 | B/S 架构设计、API 接口、流程集成 |
+| 4 | 智能制造系统与架构 | B/S + C/S 双架构设计、RESTful API 接口、桌面客户端、流程集成 |
 
 ## 技术栈
 
-### 前端
+### 前端（B/S 端）
 - HTML5 + CSS3 + JavaScript (ES6+)
 - Bootstrap 5（UI 组件库）
 - ECharts（数据可视化）
 - Axios（HTTP 请求）
+
+### 桌面客户端（C/S 端）
+- Python Tkinter（GUI 框架，标准库内置）
+- requests（HTTP 请求，调用后端 API）
+- Pillow（图片显示）
+- ttk（表格、标签页组件）
 
 ### 后端
 - Python 3.10 + Flask（Web 框架）
@@ -65,7 +71,7 @@ manufacturing-intelligent-course-design/
 │   ├── session_001_topic_research.json
 │   ├── session_002_solution_design.json
 │   └── session_003_data_preprocessing.json
-├── src/                     # 源代码目录
+├── src/                     # 源代码目录（B/S 端）
 │   ├── app.py               # Flask 应用入口
 │   ├── config.py            # 配置文件
 │   ├── models/              # 数据库模型
@@ -75,13 +81,21 @@ manufacturing-intelligent-course-design/
 │   │   ├── models/          # 模型定义
 │   │   ├── inference/       # 推理引擎
 │   │   └── postprocess/     # 后处理与可视化
+│   ├── templates/           # HTML 模板
 │   └── static/              # 前端静态资源
 │       ├── css/
 │       ├── js/
 │       └── images/
-├── templates/               # HTML 模板
+├── client/                  # C/S 桌面客户端
+│   ├── desktop_client.py    # Tkinter 桌面客户端主程序
+│   └── 启动客户端.bat        # 客户端启动脚本
 ├── tests/                   # 自动化测试
+├── test_images/             # 测试用缺陷图片（6类）
 └── docs/                    # 设计文档
+    ├── 需求规格说明书.md
+    ├── 设计报告.md
+    ├── 答辩PPT.pptx
+    └── 演示视频.mp4
 ```
 
 ## 数据集
@@ -154,9 +168,27 @@ python src/algorithms/train_classifier.py
 
 ### 启动系统
 
+#### B/S 端（Web 浏览器）
+
 ```bash
 python src/app.py
 ```
+
+启动后浏览器访问 `http://localhost:5000`，默认账号 `admin / admin123`。
+
+#### C/S 端（桌面客户端）
+
+```bash
+# 先启动后端服务
+python src/app.py
+
+# 再启动桌面客户端（另开一个终端）
+python client/desktop_client.py
+```
+
+或 Windows 下直接双击 `client/启动客户端.bat`。
+
+> 注意：C/S 客户端需要后端服务先启动，客户端通过 RESTful API 与后端通信。
 
 打开浏览器访问：http://localhost:5000
 
